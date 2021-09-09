@@ -1,4 +1,4 @@
-﻿//Criador:Felipe Machado Ignacio dos santos
+//Criador:Felipe Machado Ignacio dos santos
 //ultima atualizaçao 25/08/2020
 //Biblioteca usada no nuget: mail.dll
 
@@ -58,7 +58,7 @@ namespace Localiza_xml_email
                     {
                         Classe_email.Nome = email.Attachments[i].FileName;//recebe o nome do arquivo
                         Classe_email.Caminho_Temp = Path.GetTempPath() + Classe_email.Nome; //path da pasta temp do windows + nome do arquivo
-                        Classe_email.Caminho_Servidor = @"\\servidor\base\xml_compras\" + DateTime.Now.ToString("MM_yyyy"); // caminho no servidor local, onde serão salvos o xml
+                        Classe_email.Caminho_Servidor = @"\\servidor\base\xml_compras\"+ DateTime.Now.ToString("yyyy") + @"\" + DateTime.Now.ToString("MM_yyyy"); // caminho no servidor local, onde serão salvos o xml
                         email.Attachments[i].Save(Classe_email.Caminho_Temp);//salva o anexo na pasta temp
                         FileInfo file = new FileInfo(Classe_email.Caminho_Temp);// file info do arquivo temporario
 
@@ -77,6 +77,9 @@ namespace Localiza_xml_email
                                                 case "chNFe":
                                                     Classe_email.Chave = reader.ReadString();
                                                     break;
+                                                case "natOp":
+                                                    Classe_email.Natureza_op = reader.ReadString();
+                                                    break;
                                             }
                                         }
                                     }
@@ -87,6 +90,11 @@ namespace Localiza_xml_email
                             {
                                 MessageBox((IntPtr)0, "" + e.ToString() + "", "Erro", 0);
                             }
+                            if (Classe_email.Natureza_op.ToLower().Contains("Devolução"))
+                                Classe_email.Caminho_Servidor += @"\DEVOLUÇÃO";
+                            else
+                                Classe_email.Caminho_Servidor += @"\Contabilidade";
+
                             if (Directory.Exists(Classe_email.Caminho_Servidor))
                                 Copia_arquivo(Classe_email.Caminho_Temp, Classe_email.Caminho_Servidor + @"\" + Classe_email.Chave + ".xml");//metodo que copia mensagem para o servidor e mostra mensagem
                             else
@@ -131,10 +139,6 @@ namespace Localiza_xml_email
                                     Classe_email.Fornecedor = reader.ReadString();
                                     count++;
                                 }
-                            }
-                            if (reader.Name.ToString() == "natOp") //natureza da operação no xml
-                            {
-                                Classe_email.Natureza_op = reader.ReadString();
                             }
                         }
                     }
